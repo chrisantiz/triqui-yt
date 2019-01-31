@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/icons/material-icons.css">
+    <link rel="stylesheet" href="/css/materialize.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Triqui</title>
+</head>
+
+<body>
+
+    <!-- RAÍZ -->
+    <main id="app">
+        <socket-listener></socket-listener>
+        <transition name="fade" mode="out-in">
+            <router-view></router-view>
+        </transition>
+    </main>
+    <!-- Navbar -->
+    <template id="navbar-template">
+        <nav>
+            <div class="nav-wrapper indigo darken-4">
+                <a href="javascript:void(0)" class="brand-logo center">
+                    TRIQUI {{ state.entry ? '- ' + state.myUser.nick : '' }}
+                </a>
+            </div>
+        </nav>
+    </template>
+    <!-- Home component -->
+    <template id="home-template">
+        <section>
+            <navbar></navbar>
+            <!-- Inicio fila -->
+            <div class="row container">
+                <!-- Columna unirse -->
+                <div class="col s4" :class="[state.entry ? 'd-none' : '']">
+                    <div class="card hoverable" @keyup.enter="addMyUser">
+                        <div class="card-content pb-3">
+                            <span class="card-title font-bold">Unirse</span>
+                            <div class="input-field">
+                                <i class="material-icons prefix">account_circle</i>
+                                <input id="icon_prefix" type="text" v-model="nick" autofocus>
+                                <label for="icon_prefix">Tu nick</label>
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <button
+                                class="btn indigo waves-effect waves-light"
+                                :disabled="disabledButton"
+                                @click="addMyUser">
+                                {{ textButton }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Columna usuarios conectados -->
+                <div class="col s8" :class="[state.entry ? 'push-s2' : '']">
+                    <div class="card hoverable">
+                        <div class="card-content">
+                            <span class="card-title center font-bold">Jugadores en línea</span>
+                            <transition name="fade" mode="out-in">
+                                <table v-if="state.users.length">
+                                    <tr class="d-flex jc-space-around" v-for="(user, index) in state.users" :key="user.id">
+                                        <td>
+                                            <i class="material-icons fs-1 line-height-40 green-text">brightness_1</i>
+                                        </td>
+                                        <!-- Nombre del usuario -->
+                                        <td class="fs-1-2">{{ user.nick }}</td>
+                                        <!-- Botón para retar -->
+                                        <td>
+                                            <button class="btn indigo waves-effect waves-light"
+                                                :disabled="!state.entry || user.play"
+                                                @click="challenge(user.id)">
+                                                <i class="material-icons right fs-2 font-bold">chevron_right</i>
+                                                Retar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- Mostrar cuando no hayan usuarios conectados -->
+                                <h4 class="center" v-else>Ninguno</h4>
+                            </transition>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Fin fila -->
+        </section>
+    </template>
+    <!-- Play component -->
+    <template id="play-template">
+        <section>
+            <!-- Barra superior -->
+            <navbar></navbar>
+            <div class="container">
+                <div class="card-panel hoverable">
+                    <div class="d-flex">
+                        <div
+                            class="d-flex flex-column align-items-end flex-column-reverse border-bottom-5" :class="currentShift(p1)">
+                            {{ p1 === state.myUser.nick ? 'yo' : p1 | toUpper }}
+                            <i class="material-icons red-text fs-2">close</i>
+                        </div>
+                        <!-- Tabla -->
+                        <table-triqui @target="getTarget"></table-triqui>
+                        <div
+                            class="d-flex flex-column align-items-end flex-column-reverse border-bottom-5" :class="currentShift(p2)">
+                            {{ p2 === state.myUser.nick ? 'yo' : p2 | toUpper }}
+                            <i class="material-icons blue-text fs-2">panorama_fish_eye</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <script src="/js/lib/vue.min.js"></script>
+    <script src="/js/lib/vue-router.min.js"></script>
+    <script src="/js/lib/vue-socketio.js"></script>
+    <script src="/js/lib/materialize.min.js"></script>
+    <script src="/js/lib/axios.min.js"></script>
+    <script src="/js/lib/sweetalert2.all.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>
