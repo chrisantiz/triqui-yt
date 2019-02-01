@@ -22,6 +22,7 @@ const Home = {
             if (!this.userExists && this.nick.length) {
                 state.entry = true;
                 this.$socket.emit('adduser', this.nick);
+                this.nick = '';
             }
         },
         // Enviar un reto a otro jugador
@@ -291,7 +292,6 @@ Vue.component('socketListener', {
         },
         addmyuser(myUser) {
             state.myUser = myUser;
-            this.nick = '';
         },
         adduser(user) {
             state.users.push(user);
